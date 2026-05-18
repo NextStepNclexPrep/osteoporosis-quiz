@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCLEX Practice Quiz: Osteoporosis</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-light);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-box {
+            margin-bottom: 25px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: var(--primary-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 15px;
+            text-align: left;
+            background: var(--surface);
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover:not([disabled]) {
+            background-color: #f1f5f9;
+            border-color: var(--primary-light);
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background-color: #ecfdf5;
+            color: #065f46;
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--danger);
+            background-color: #fef2f2;
+            color: #991b1b;
+        }
+
+        .rationale-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0fdf4;
+            border-left: 4px solid var(--success);
+            border-radius: 4px;
+            display: none;
+        }
+
+        .rationale-title {
+            font-weight: bold;
+            color: #166534;
+            margin-bottom: 5px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .next-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .next-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        .results-box {
+            text-align: center;
+            display: none;
+            padding: 20px 0;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            background-color: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>NCLEX-RN Practice Quiz</h1>
+        <div class="subtitle">Subject: Osteoporosis & Musculoskeletal Management</div>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+    </header>
+
+    <!-- Quiz interface -->
+    <div id="quiz-interface">
+        <div class="quiz-box">
+            <div class="question-number" id="q-num">Question 1 of 20</div>
+            <div class="question-text" id="q-text">Loading question...</div>
+            <div class="options-list" id="options-container">
+                <!-- Options injected by JS -->
+            </div>
+        </div>
+
+        <div class="rationale-box" id="rationale-container">
+            <div class="rationale-title">NCLEX Rationale:</div>
+            <p id="rationale-text">Rationale content goes here.</p>
+        </div>
+
+        <div class="controls">
+            <button class="next-btn" id="next-button" onclick="nextQuestion()">Next Question</button>
+        </div>
+    </div>
+
+    <!-- Results interface -->
+    <div class="results-box" id="results-interface">
+        <h2>Quiz Completed!</h2>
+        <p>Your overall performance on Osteoporosis management:</p>
+        <div class="score-display" id="score-text">0 / 20</div>
+        <p id="performance-feedback"></p>
+        <button class="restart-btn" onclick="restartQuiz()">Retake Quiz</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            question: "A nurse is conducting a health screening at a community center. Which of the following clients faces the highest risk for developing osteoporosis?",
+            options: [
+                "A 40-year-old male who undergoes regular weight-bearing exercise.",
+                "A 65-year-old Caucasian female who is postmenopausal with a slender build.",
+                "A 50-year-old African American female who takes calcium supplements.",
+                "A 30-year-old Hispanic male with a history of acute appendectomy."
+            ],
+            correct: 1,
+            rationale: "Postmenopausal, small-framed, slender Caucasian or Asian women possess the highest demographic risk for primary osteoporosis due to decreased estrogen levels and lower baseline bone mass density."
+        },
+        {
+            question: "A client with severe osteoporosis is prescribed Alendronate. Which administration instruction must the nurse include in the teaching plan?",
+            options: [
+                "Take the medication with a full glass of milk right before bedtime.",
+                "Take the medication immediately after breakfast with juice.",
+                "Take the medication first thing in the morning with plain water and remain upright for at least 30 minutes.",
+                "Crush the tablet and mix it into applesauce for faster absorption."
+            ],
+            correct: 2,
+            rationale: "Alendronate (a bisphosphonate) must be taken on an empty stomach with plain water to optimize absorption. The client must stay upright for 30 minutes to prevent severe esophageal irritation and erosion."
+        },
+        {
+            question: "A nurse reviews the Dual-Energy X-ray Absorptiometry (DEXA) scan results of a client. A T-score of -2.8 is noted. How should the nurse interpret this finding?",
+            options: [
+                "The client has normal bone density values.",
+                "The client has osteopenia, indicating a mild baseline loss.",
+                "The client has osteoporosis.",
+                "The findings are inconclusive and require a bone biopsy."
+            ],
+            correct: 2,
+            rationale: "According to WHO criteria, a T-score of -1.0 or higher is normal. A T-score between -1.0 and -2.5 indicates osteopenia. A T-score of -2.5 or lower confirms a diagnosis of osteoporosis."
+        },
+        {
+            question: "The nurse creates an exercise plan for an older adult client diagnosed with advanced osteoporosis. Which activity is most appropriate to include?",
+            options: [
+                "High-impact aerobics to rapidly build bone mass.",
+                "Bowling and trunk-twisting stretches.",
+                "Regular brisk walking and light weight-bearing activities.",
+                "Deep-water diving and intensive swimming."
+            ],
+            correct: 2,
+            rationale: "Brisk walking is a low-impact, weight-bearing exercise that stimulates osteoblast activity safely. High-impact activities or trunk twisting increase the immediate risk of pathologic vertebral fractures."
+        },
+        {
+            question: "A client is prescribed Raloxifene for the prevention of postmenopausal osteoporosis. Which finding in the client's medical history represents a strict contraindication?",
+            options: [
+                "History of deep vein thrombosis (DVT).",
+                "History of mild osteoarthritis in the knees.",
+                "Current diagnosis of primary hypothyroidism.",
+                "Allergy to penicillin derivatives."
+            ],
+            correct: 0,
+            rationale: "Raloxifene is a Selective Estrogen Receptor Modulator (SERM). It carries a boxed warning due to an increased risk of thromboembolic events, including DVT and pulmonary embolism."
+        },
+        {
+            question: "A nurse prepares a discharge plan for a client with secondary osteoporosis due to long-term medication use. Which classification of medications most likely contributed to this condition?",
+            options: [
+                "Loop diuretics.",
+                "Corticosteroids.",
+                "Beta-adrenergic blockers.",
+                "Nonsteroidal anti-inflammatory drugs (NSAIDs)."
+            ],
+            correct: 1,
+            rationale: "Long-term glucocorticoid/corticosteroid therapy (such as prednisone) inhibits osteoblast function, reduces calcium absorption in the gut, and directly increases bone resorption, leading to secondary osteoporosis."
+        },
+        {
+            question: "A home health nurse assesses an older adult client with severe osteoporosis. Which modification is the highest priority to prevent injury in the home setting?",
+            options: [
+                "Installing a digital thermostat for consistent heating.",
+                "Removing throw rugs and securing electrical cords along paths.",
+                "Replacing all kitchen glassware with plastic containers.",
+                "Upgrading the home security alarm system."
+            ],
+            correct: 1,
+            rationale: "Fall prevention is paramount in severe osteoporosis because minor falls can precipitate devastating hip or spinal fractures. Removing environmental trip hazards like throw rugs takes clinical priority."
+        },
+        {
+            question: "A client presents with an acute compression fracture of the T12 vertebra secondary to osteoporosis. Which nursing intervention should be prioritized during the immediate acute phase?",
+            options: [
+                "Initiating an aggressive, high-impact physical therapy routine.",
+                "Administering prescribed analgesics and assisting with gentle log-rolling maneuvers.",
+                "Encouraging the client to sit in a soft, deep armchair for hours.",
+                "Applying heavy warm moist packs continuously to the site without checking skin integrity."
+            ],
+            correct: 1,
+            rationale: "Managing severe acute pain and maintaining spinal alignment via gentle log-rolling preserves structural integrity and comfort while protecting the spinal cord from further compression issues."
+        },
+        {
+            question: "A nurse provides dietary teaching to a client diagnosed with osteopenia. Which combination of foods offers the highest amount of dietary calcium?",
+            options: [
+                "Baked chicken breast, white rice, and corn.",
+                "Sardines in oil, fortified orange juice, and steamed broccoli.",
+                "Pork chops, applesauce, and baked potatoes.",
+                "White bread, bananas, and tossed green salad with oil."
+            ],
+            correct: 1,
+            rationale: "Sardines (eaten with soft bones), fortified orange juice, and cruciferous vegetables like broccoli provide high concentrations of bioavailable calcium and vitamin D."
+        },
+        {
+            question: "A client is scheduled to receive an annual intravenous infusion of Zoledronic acid for osteoporosis treatment. Which baseline lab value must the nurse verify before administering this medication?",
+            options: [
+                "Serum potassium.",
+                "Serum creatinine and renal clearance status.",
+                "Prothrombin time (PT/INR).",
+                "Arterial blood gases (ABGs)."
+            ],
+            correct: 1,
+            rationale: "Zoledronic acid is highly potent and cleared via the kidneys. It is contraindicated in clients with severe renal impairment due to the risk of acute kidney injury; thus, creatinine levels must be verified."
+        },
+        {
+            question: "The nurse notes that an elderly female client has developed a marked curvature of the upper thoracic spine, often called a 'dowager's hump'. How should the nurse document this structural deviation?",
+            options: [
+                "Lordosis.",
+                "Scoliosis.",
+                "Kyphosis.",
+                "Subluxation."
+            ],
+            correct: 2,
+            rationale: "Kyphosis is an exaggerated forward curvature of the thoracic spine resulting from repeated, gradual compression fractures of fragile vertebral bodies in advanced osteoporosis."
+        },
+        {
+            question: "A client asks the nurse why vitamin D3 is prescribed alongside a calcium supplement. Which response by the nurse provides the accurate physiological rationale?",
+            options: [
+                "\"Vitamin D prevents the kidneys from excreting excess calcium.\"",
+                "\"Vitamin D is essential for the active gastrointestinal absorption of calcium.\"",
+                "\"Vitamin D breaks down calcium into a liquid form within the stomach.\"",
+                "\"Vitamin D stimulates the parathyroid gland to release more calcium stored in the liver.\""
+            ],
+            correct: 1,
+            rationale: "Without adequate vitamin D, the small intestine cannot efficiently absorb calcium ions from dietary or supplemental sources, rendering calcium supplementation less effective."
+        },
+        {
+            question: "A nurse is teaching a client about a new prescription for Calcitonin-salmon nasal spray. Which instruction should be included regarding administration?",
+            options: [
+                "Spray the medication into both nostrils twice every morning.",
+                "Alternate nostrils daily to minimize local nasal irritation.",
+                "Inhale deeply while using a spacer device.",
+                "Keep the spray frozen solid between daily doses."
+            ],
+            correct: 1,
+            rationale: "Alternating nostrils daily reduces mucosal irritation, dryness, and potential ulceration associated with chronic use of intranasal calcitonin."
+        },
+        {
+            question: "The nurse is preparing a presentation on osteoporosis prevention. Which modifiable lifestyle risk factor should the nurse emphasize?",
+            options: [
+                "Advanced chronological age.",
+                "Family history of hip fractures.",
+                "Active cigarette smoking and high alcohol consumption.",
+                "Female biological sex."
+            ],
+            correct: 2,
+            rationale: "Smoking tobacco and excessive alcohol intake are direct, modifiable risk factors. Smoking decreases estrogen levels and impairs osteoblasts, while alcohol suppresses calcium absorption."
+        },
+        {
+            question: "A client with advanced osteoporosis is at high risk for pathological fractures. The nurse understands that a pathological fracture is best defined as which of the following?",
+            options: [
+                "A fracture caused by high-velocity motor vehicle trauma.",
+                "A fracture that occurs due to minimal stress or everyday movement on weakened bone structures.",
+                "A greenstick fracture commonly observed in young pediatric populations.",
+                "An open wound fracture where bone breaks through skin surfaces."
+            ],
+            correct: 1,
+            rationale: "Pathological fractures happen when the structural matrix of a bone is so compromised by disease (like osteoporosis) that it fails under normal, everyday physiological weight or minor torque."
+        },
+        {
+            question: "A nurse assesses a client taking high doses of calcium and Vitamin D supplements. Which clinical manifestation would alert the nurse to potential hypercalcemia?",
+            options: [
+                "Hyperactive deep tendon reflexes and positive Trousseau's sign.",
+                "Nausea, vomiting, constipation, and muscle weakness.",
+                "Severe diarrhea and generalized abdominal cramping.",
+                "Spasms of the facial muscles when tapping the facial nerve."
+            ],
+            correct: 1,
+            rationale: "Hypercalcemia acts as a central nervous system and muscle depressant. Manifestations include anorexia, nausea, vomiting, profound constipation, and generalized muscle weakness."
+        },
+        {
+            question: "A client with osteoporosis is prescribed Teriparatide. The nurse understands that this medication works through which unique physiological mechanism?",
+            options: [
+                "It binds permanently to bone minerals to slow down osteoclasts.",
+                "It mimics estrogen receptors directly within breast tissues.",
+                "It is a recombinant human parathyroid hormone that stimulates new bone formation by osteoblasts.",
+                "It neutralizes free calcium ions floating inside vascular pathways."
+            ],
+            correct: 2,
+            rationale: "Unlike bisphosphonates which prevent bone breakdown, Teriparatide is an anabolic agent (parathyroid hormone analogue) that actively stimulates osteoblastic bone deposition."
+        },
+        {
+            question: "Which diagnostic laboratory test would a healthcare provider order to rule out secondary osteoporosis caused by primary hyperparathyroidism?",
+            options: [
+                "Serum parathyroid hormone (PTH) and total serum calcium.",
+                "Complete blood count (CBC) with differential.",
+                "Serum uric acid levels.",
+                "Erythrocyte sedimentation rate (ESR)."
+            ],
+            correct: 0,
+            rationale: "Primary hyperparathyroidism causes overproduction of PTH, which strips calcium from the bones into the bloodstream. Checking PTH and calcium levels helps rule out this endocrine cause of secondary osteoporosis."
+        },
+        {
+            question: "The nurse is reviewing the chart of a client with osteoporosis. Which assessment finding is an early subjective sign of potential spinal compression fractures?",
+            options: [
+                "Sudden loss of hearing abilities.",
+                "A progressive decrease in height accompanied by chronic low back pain.",
+                "Development of visible skin petechiae across the chest wall.",
+                "Numbness restricted to the upper bilateral thumb regions."
+            ],
+            correct: 1,
+            rationale: "Gradual height loss over time along with persistent back pain is a hallmark presentation of progressive, quiet vertebral compression fractures narrowing the spinal framework."
+        },
+        {
+            question: "A nurse evaluates a client's understanding of dietary restrictions while taking oral calcium supplements. Which statement indicates the client understands how to maximize absorption?",
+            options: [
+                "\"I will take my calcium pill at the exact same time as my heavy iron supplement.\"",
+                "\"I should avoid consuming large amounts of spinach or bran cereal with my supplement.\"",
+                "\"I can take all 1,200 mg of my daily calcium at once with breakfast.\"",
+                "\"I will take my calcium pill with an extra-large cup of black coffee.\""
+            ],
+            correct: 1,
+            rationale: "Oxalates (found in spinach/rhubarb) and phytates (found in bran/whole grains) bind tightly to calcium in the digestive tract, significantly reducing its absorption. Calcium should also be split into doses of 500 mg or less for optimal intake."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const qNumEl = document.getElementById('q-num');
+    const qTextEl = document.getElementById('q-text');
+    const optionsContainer = document.getElementById('options-container');
+    const rationaleContainer = document.getElementById('rationale-container');
+    const rationaleText = document.getElementById('rationale-text');
+    const nextButton = document.getElementById('next-button');
+    const progressEl = document.getElementById('progress');
+    const quizInterface = document.getElementById('quiz-interface');
+    const resultsInterface = document.getElementById('results-interface');
+    const scoreText = document.getElementById('score-text');
+    const feedbackEl = document.getElementById('performance-feedback');
+
+    function loadQuestion() {
+        // Reset states
+        rationaleContainer.style.display = 'none';
+        nextButton.style.display = 'none';
+        optionsContainer.innerHTML = '';
+
+        let currentQuestion = quizData[currentQuestionIndex];
+        
+        // Update headers & progress bar
+        qNumEl.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        qTextEl.innerText = currentQuestion.question;
+        progressEl.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
+
+        // Render options buttons
+        currentQuestion.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = 'option-btn';
+            button.innerText = option;
+            button.onclick = () => selectOption(index, button);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function selectOption(selectedIndex, clickedButton) {
+        let currentQuestion = quizData[currentQuestionIndex];
+        const allButtons = optionsContainer.querySelectorAll('.option-btn');
+
+        // Disable further clicking
+        allButtons.forEach(btn => btn.disabled = true);
+
+        // Check if correct
+        if (selectedIndex === currentQuestion.correct) {
+            clickedButton.classList.add('correct');
+            score++;
+        } else {
+            clickedButton.classList.add('wrong');
+            // Highlight the true correct one
+            allButtons[currentQuestion.correct].classList.add('correct');
+        }
+
+        // Show rationale text
+        rationaleText.innerText = currentQuestion.rationale;
+        rationaleContainer.style.display = 'block';
+
+        // Show Next button
+        nextButton.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        progressEl.style.width = '100%';
+        quizInterface.style.display = 'none';
+        resultsInterface.style.display = 'block';
+        scoreText.innerText = `${score} / ${quizData.length}`;
+
+        let percentage = (score / quizData.length) * 100;
+        if (percentage >= 85) {
+            feedbackEl.innerText = "Excellent work! You demonstrate strong clinical judgment regarding osteoporosis risks, medications, and client safety benchmarks.";
+            feedbackEl.style.color = "#10b981";
+        } else if (percentage >= 75) {
+            feedbackEl.innerText = "Good job! You passed the baseline standard, but review pharmacologic rationales and specific T-score parameters to solidify your performance.";
+            feedbackEl.style.color = "#3b82f6";
+        } else {
+            feedbackEl.innerText = "Remediation recommended. Review nursing safety precautions, medication administration rules, and primary lifestyle modifications for osteoporosis.";
+            feedbackEl.style.color = "#ef4444";
+        }
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        quizInterface.style.display = 'block';
+        resultsInterface.style.display = 'none';
+        loadQuestion();
+    }
+
+    // Initialize layout on runtime load
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
